@@ -2,12 +2,13 @@ import { Router } from "express";
 import { TMDBAdapter } from "../../../infrastructure/adapter/TMDBAdapter.ts";
 import { GetMovies } from "../../../application/use-cases/GetMovies.ts";
 import { MovieController } from "../controllers/MovieController.ts";
+import { SqlFileWriter } from "../../../infrastructure/utils/SqlFileWriter.ts";
 
 const router = Router()
 
 const repository = new TMDBAdapter()
 const useCase = new GetMovies(repository)
-const controller = new MovieController(useCase)
+const controller = new MovieController(useCase, new SqlFileWriter()) // <--- Pasar instancia de SqlFileWriter al controlador
 
 router.get("/", controller.getAll.bind(controller))
 router.get("/popular", controller.getPopular.bind(controller))

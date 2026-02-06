@@ -6,7 +6,17 @@ export class TMDBAdapter implements MovieRepository {
     async getPopular(page: number = 1): Promise<Movie[]> {
         try {
             const response: any = await new TMDB().TMDBAPI("/movie/popular", { page, language: 'es-ES' })
-            return this.mapToEntities(response.results)
+            const movies = this.mapToEntities(response.results)
+            const results: Movie[] = []
+            for (const movie of movies) {
+                const enrichedMovie = await this.getById(movie.id)
+                console.log(`Enriched Movie ID ${movie.id}:`, enrichedMovie)
+                if (enrichedMovie) {
+                    results.push(enrichedMovie)
+                }
+            }
+
+            return results
         } catch (error) {
             console.error(error)
             return []
@@ -16,7 +26,17 @@ export class TMDBAdapter implements MovieRepository {
     async getNowPlaying(page: number = 1): Promise<Movie[]> {
         try {
             const response: any = await new TMDB().TMDBAPI("/movie/now_playing", { page, language: 'es-ES' })
-            return this.mapToEntities(response.results)
+            const movies = this.mapToEntities(response.results)
+            const results: Movie[] = []
+            for (const movie of movies) {
+                const enrichedMovie = await this.getById(movie.id)
+                console.log(`Enriched Movie ID ${movie.id}:`, enrichedMovie)
+                if (enrichedMovie) {
+                    results.push(enrichedMovie)
+                }
+            }
+
+            return results
         } catch (error) {
             console.error(error)
             return []
@@ -26,7 +46,17 @@ export class TMDBAdapter implements MovieRepository {
     async getTopRated(page: number = 1): Promise<Movie[]> {
         try {
             const response: any = await new TMDB().TMDBAPI("/movie/top_rated", { page, language: 'es-ES' })
-            return this.mapToEntities(response.results)
+            const movies = this.mapToEntities(response.results)
+            const results: Movie[] = []
+            for (const movie of movies) {
+                const enrichedMovie = await this.getById(movie.id)
+                console.log(`Enriched Movie ID ${movie.id}:`, enrichedMovie)
+                if (enrichedMovie) {
+                    results.push(enrichedMovie)
+                }
+            }
+
+            return results
         } catch (error) {
             console.error(error)
             return []
@@ -36,7 +66,17 @@ export class TMDBAdapter implements MovieRepository {
     async getUpcoming(page: number = 1): Promise<Movie[]> {
         try {
             const response: any = await new TMDB().TMDBAPI("/movie/upcoming", { page, language: 'es-ES' })
-            return this.mapToEntities(response.results)
+            const movies = this.mapToEntities(response.results)
+            const results: Movie[] = []
+            for (const movie of movies) {
+                const enrichedMovie = await this.getById(movie.id)
+                console.log(`Enriched Movie ID ${movie.id}:`, enrichedMovie)
+                if (enrichedMovie) {
+                    results.push(enrichedMovie)
+                }
+            }
+
+            return results
         } catch (error) {
             console.error(error)
             return []
@@ -120,8 +160,11 @@ export class TMDBAdapter implements MovieRepository {
             title: data.title,
             video: data.video,
             vote_average: data.vote_average,
-            vote_count: data.vote_count
-        } as Movie;
+            vote_count: data.vote_count,
+            company : data.production_companies,
+            colection: data.belongs_to_collection
+
+        } as Movie; 
         // Note: Direct casting as Movie because the class structure matches TMDB response.
         // If strict class instantiation is needed based on the class definition:
         /*

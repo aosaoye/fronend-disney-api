@@ -7,6 +7,9 @@ export class SqliteAdapter implements MovieRepository {
     constructor() {
         this.db = new SqliteDB()
     }
+    getTrailer(id: number): Promise<string | null> {
+        throw new Error("Method not implemented.");
+    }
     async getAll(page: number = 1): Promise<Movie[]> {
         const limit = 20;
         const offset = (page - 1) * limit;
