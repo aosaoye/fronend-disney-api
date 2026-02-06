@@ -19,6 +19,8 @@ export class Movie {
     public actors: Actor[];
     public duration: number;
     public readonly rating: number;
+    public colection: Colection;
+    public company : Company;
     constructor(
         id: number,
         adult: boolean,
@@ -38,6 +40,8 @@ export class Movie {
         actors: Actor[],
         duration: number,
         rating: number,
+        colection : Colection,
+        company: Company,
     ) {
         this.id = id;
         this.adult = adult;
@@ -57,7 +61,8 @@ export class Movie {
         this.actors = actors;
         this.duration = duration;
         this.rating = rating;
-
+        this.colection= colection;
+        this.company= company;
     }
 }
 
@@ -67,4 +72,16 @@ export interface Actor {
     profile_path: string | null;
     character?: string;
 }
+export interface Company {
+    id: number;
+    name: string;
+    poster_path: string | null;
+    backdrop_path: string | null;
+}
 
+export interface Colection {
+    id: number;
+    name: string;
+    logo: string | null;
+    origin_country: string | null;
+}

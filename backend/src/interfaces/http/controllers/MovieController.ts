@@ -7,15 +7,19 @@ export class MovieController {
     private useCase: GetMovies;
     private sqlWriter: SqlFileWriter; // <--- Declarar propiedad
 
-    constructor(useCase: GetMovies) {
+    constructor(useCase: GetMovies, sqlWriter: SqlFileWriter) {
         this.useCase = useCase;
-        this.sqlWriter = new SqlFileWriter(); // <--- Inicializar
+        this.sqlWriter = sqlWriter;
     }
 
     async getAll(req: Request, res: Response) {
         try {
             const page = parseInt(req.query.page as string) || 1;
             const movies = await this.useCase.execute(page);
+            
+            // Guardar en SQL
+            await this.sqlWriter.saveMoviesToSql(movies, `Popular - Page ${page}`);
+
             res.json(movies);
         } catch (error) {
             console.error(error);
@@ -26,6 +30,7 @@ export class MovieController {
     async getById(req: Request, res: Response) {
         try {
             const movie = await this.useCase.executeById(Number(req.params.id));
+            
             res.json(movie);
         } catch (error) {
             console.error(error);
@@ -37,6 +42,7 @@ export class MovieController {
         try {
             const page = parseInt(req.query.page as string) || 1;
             const movies = await this.useCase.executeByName(req.params.name! as string, page);
+
             res.json(movies);
         } catch (error) {
             console.error(error);

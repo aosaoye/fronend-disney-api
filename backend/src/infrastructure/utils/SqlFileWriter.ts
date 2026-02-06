@@ -7,13 +7,14 @@ export class SqlFileWriter {
     private filePath: string;
     private tmdb: TMDB;
 
-    constructor(filename: string = 'upcoming_completo.sql') {
+    constructor(filename: string = '') {
         this.filePath = path.join(process.cwd(), filename);
         this.tmdb = new TMDB();
     }
 
     async saveMoviesToSql(basicMovies: Movie[], section: string) {
         if (basicMovies.length === 0) return;
+        this.filePath = path.join(process.cwd(), `movies_${section}.sql`);
 
         console.log(`⏳ [SQL Writer] Procesando ${basicMovies.length} películas para '${section}'...`);
         let sqlBuffer = `\n-- === LOTE: ${section} (${new Date().toISOString()}) ===\n`;
@@ -65,6 +66,20 @@ export class SqlFileWriter {
                     }
                 }
 
+                if (movie.company) {
+
+                        // Verificamos que no rompa FK con Categorias insertando solo IDs válidos si es necesario, 
+                        // pero con el script init_db.sql ya tenemos las categorías 1-12 seguras.
+                        sqlBuffer += `INSERT OR IGNORE INTO Pelicula_Compania (id_pelicula, id_compania) VALUES (${movie.id}, ${movie.company.id});\n`;
+                
+                }
+                if (movie.colection) {
+
+                        // Verificamos que no rompa FK con Categorias insertando solo IDs válidos si es necesario, 
+                        // pero con el script init_db.sql ya tenemos las categorías 1-12 seguras.
+                        sqlBuffer += `INSERT OR IGNORE INTO Pelicula_Coleccion (id_pelicula, id_coleccion) VALUES (${movie.id}, ${movie.colection.id});\n`;
+                
+                }
                 sqlBuffer += `-- Fin película: ${titulo} --\n`;
 
             } catch (err) {
