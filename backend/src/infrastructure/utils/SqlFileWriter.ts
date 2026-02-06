@@ -23,7 +23,7 @@ export class SqlFileWriter {
             try {
                 // 1. Enriquecer datos (Fetch extra a TMDB)
                 const fullData = await this.enrichMovieData(movie.id);
-                
+
                 // Preparar datos para SQL
                 const titulo = this.escape(movie.title);
                 const desc = this.escape(movie.overview);
@@ -32,7 +32,8 @@ export class SqlFileWriter {
                 const trailer = fullData.trailer || '';
                 const anio = movie.release_date ? movie.release_date.split('-')[0] : '2024';
                 const duracion = fullData.duration || 0;
-                const rating = fullData.rating;
+                const rating = movie.vote_average || 0;
+                const votos = movie.vote_count || 0;
 
                 // CAMBIO 1: Actores (INSERT OR IGNORE para no fallar si ya existe)
                 if (fullData.actors) {
@@ -46,7 +47,7 @@ export class SqlFileWriter {
                 // CAMBIO 2: Película (INSERT OR REPLACE para actualizar si ya existe y evitar errores de duplicados)
                 sqlBuffer += `INSERT OR REPLACE INTO Pelicula (id_pelicula, titulo, descripcion, poster_path, backdrop_path, trailer, anio_estreno, duracion) VALUES (${movie.id}, '${titulo}', '${desc}', '${poster}', '${backdrop}', '${trailer}', ${anio}, ${duracion});\n`;
 
-                
+
                 // Guardamos la relacion entre pelicula y actor
                 if (fullData.actors) {
                     for (const actor of fullData.actors) {
@@ -57,7 +58,7 @@ export class SqlFileWriter {
                 // CAMBIO 3: Relaciones (INSERT OR IGNORE para evitar duplicados en la tabla intermedia)
                 if (movie.genre_ids) {
                     for (const genreId of movie.genre_ids) {
-                        const myCatId = (genreId % 12) + 1; 
+                        const myCatId = (genreId % 12) + 1;
                         // Verificamos que no rompa FK con Categorias insertando solo IDs válidos si es necesario, 
                         // pero con el script init_db.sql ya tenemos las categorías 1-12 seguras.
                         sqlBuffer += `INSERT OR IGNORE INTO Pelicula_Categoria (id_pelicula, id_categoria) VALUES (${movie.id}, ${myCatId});\n`;
@@ -81,7 +82,7 @@ export class SqlFileWriter {
     }
 
     // Método auxiliar para pedir detalles extra
-    private async enrichMovieData(movieId: number): Promise<{ trailer?: string, actors?: Actor[], duration?: number }> {
+    private async enrichMovieData(movieId: number): Promise<{ trailer: string | undefined, actors: Actor[], duration: number }> {
         // Pedimos "credits" y "videos" en la misma llamada (append_to_response es clave en TMDB)
         // endpoint: /movie/123?append_to_response=credits,videos&language=es-ES
         const data: any = await this.tmdb.TMDBAPI(`/movie/${movieId}`, {
@@ -91,8 +92,8 @@ export class SqlFileWriter {
 
         // Extraer Trailer
         const videos = data.videos?.results || [];
-        const trailerObj = videos.find((v: any) => v.site === 'YouTube' && v.type === 'Trailer') 
-                        || videos.find((v: any) => v.site === 'YouTube');
+        const trailerObj = videos.find((v: any) => v.site === 'YouTube' && v.type === 'Trailer')
+            || videos.find((v: any) => v.site === 'YouTube');
         const trailer = trailerObj ? `https://www.youtube.com/watch?v=${trailerObj.key}` : undefined;
 
         // Extraer Actores (Top 5 para no llenar demasiado la BD)

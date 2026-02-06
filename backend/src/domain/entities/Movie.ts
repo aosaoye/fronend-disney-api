@@ -3,22 +3,22 @@
 export class Movie {
     public readonly id: number;
     public readonly title: string;
-    public readonly adult:boolean;
-    public readonly backdrop_path:string;
-    public readonly genre_ids:number[];
-    public readonly original_language:string;
-    public readonly original_title:string;
-    public readonly overview:string;
-    public readonly popularity:number;
-    public readonly poster_path:string;
-    public readonly release_date:string;
-    public readonly video:boolean;
-    public readonly vote_average:number;
-    public readonly vote_count:number;
+    public readonly adult: boolean;
+    public readonly backdrop_path: string;
+    public readonly genre_ids: number[];
+    public readonly original_language: string;
+    public readonly original_title: string;
+    public readonly overview: string;
+    public readonly popularity: number;
+    public readonly poster_path: string;
+    public readonly release_date: string;
+    public readonly video: boolean;
+    public readonly vote_average: number;
+    public readonly vote_count: number;
     public trailer: string;
     public actors: Actor[];
     public duration: number;
-    public rating: number;
+    public readonly rating: number;
     constructor(
         id: number,
         adult: boolean,
@@ -38,7 +38,7 @@ export class Movie {
         actors: Actor[],
         duration: number,
         rating: number,
-        ) {
+    ) {
         this.id = id;
         this.adult = adult;
         this.backdrop_path = backdrop_path;
